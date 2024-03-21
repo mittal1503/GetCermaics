@@ -15,7 +15,6 @@ export const GET = async() =>{
        console.log(error);
        return new NextResponse("Error in fetching user" + error,{status: 500})
    }
-
 }
 
 export const POST = async(request:Request) =>

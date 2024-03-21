@@ -2,6 +2,7 @@ import './globals.css'
 import type { Metadata } from 'next'
 import { Quicksand } from 'next/font/google'
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v13-appRouter';
+import { GlobalContextProvider } from './context/cartItems';
 
 const inter = Quicksand({ subsets: ['latin'] })
 
@@ -18,7 +19,11 @@ children,
   return (
     <html lang="en" className={inter.className}>
       <AppRouterCacheProvider>
-         <body>{children}</body>
+         <body>
+         <GlobalContextProvider>
+             {children}
+         </GlobalContextProvider>
+         </body>
       </AppRouterCacheProvider>
     </html>
   )

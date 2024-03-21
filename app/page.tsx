@@ -1,7 +1,6 @@
 "use client"
-import {  Button, Card, CardActions, CardContent, CardMedia, Divider, FormControl, Link, OutlinedInput, TextField, Typography, dividerClasses } from '@mui/material';
+import {  Button, Card, CardActionArea, CardActions, CardContent, CardMedia, Divider, FormControl, Link, OutlinedInput, TextField, Typography, dividerClasses } from '@mui/material';
 import logo from './logo.png'
-import ShoppingCartCheckoutOutlinedIcon from '@mui/icons-material/ShoppingCartCheckoutOutlined';
 import Image from 'next/image'
 import { searchInputStyles } from './styles';
 import HeadphonesOutlinedIcon from '@mui/icons-material/HeadphonesOutlined';
@@ -9,23 +8,37 @@ import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import { useEffect, useState } from 'react';
 import axios from 'axios'
-
+import { useRouter } from 'next/navigation';
+import { useGlobalContext } from './context/cartItems';
 const label = {inputProps: { 'aria-label': 'Checkbox demo' }};
 const num = [1]
 const id = 1
 
+
 interface Item {
  name: string,
  price: number,
- image: string
+ image: string,
+ _id: string
 }
 
 export default function Home() {
+  const {cartItems,setCartItems} = useGlobalContext();
 
+  const router = useRouter();
   const [itemss,setItems] = useState<Item[]>([])
-
+  const [count,setCount] = useState(0);
   useEffect(()=>{
-
+    var countObj = {
+      'items':count
+    }
+    console.log("useeffect of ls callled")
+    localStorage.setItem("items",JSON.stringify(count))
+   
+  }
+  ,[setCount]
+  )
+  useEffect(()=>{
     const fetchData = async() =>
     {
         try{
@@ -41,7 +54,8 @@ export default function Home() {
     }
     fetchData()
   },[])
-
+  console.log("cartItems===>>>",cartItems)
+  console.log("itemss===>>>",itemss)
   return (
     <main>
       <div className='container mx-auto px-24 flex py-7'>
@@ -54,8 +68,15 @@ export default function Home() {
          </FormControl>
        </form>
        </div>  
-       <div className='p-5'>
-       <ShoppingCartOutlinedIcon/> 
+       <div className='p-5 '>
+        {(cartItems.length)? <div className='ml-3 mt-1' style={{position:'absolute',top:'33px',display:'flex',alignItems:'center',justifyContent:'center',backgroundColor:'yellowgreen',borderRadius:'50%',width:'20px',height:'20px',textAlign:'center',fontSize:'12px',fontWeight:'bold',color:'#062e2a'}} >
+        {cartItems.length}
+        </div> :<></>}
+       
+        <div style={{cursor:"pointer"}} onClick={()=>router.push('/checkout/cart')}>
+        <ShoppingCartOutlinedIcon/> 
+          </div> 
+     
        </div>
        <div className='p-5'>
         <AccountCircleOutlinedIcon/>
@@ -82,15 +103,17 @@ export default function Home() {
       <div className="container mx-auto px-24 grid grid-cols-4 gap-8 p-12">
         {
           itemss?.map((item)=>
-          <Card sx={{ maxWidth: 345 }}>
+          <Card sx={{ maxWidth: 345 }}  onClick={()=> router.push(`item/${item._id}`)} >
+            <CardActionArea>
           <CardMedia
             sx={{ height: 290 }}
             title="green iguana"
+           
           >
          <Image src={`${item.image}`} alt={''}  className='m-4'  width="280"
           height="100"/>
           </CardMedia>
-
+        
           <CardContent>
             <Typography variant="button" component="div" color="text.primary" className='pl-4'>
              {`${item.name}`}
@@ -100,11 +123,12 @@ export default function Home() {
                MRP ₹{`${item.price}`}
             </Typography>
 
-            <CardActions>
-              <Button className=''>Add to <ShoppingCartCheckoutOutlinedIcon/></Button>
-            </CardActions>
-     
+            {/* <CardActions>
+              <Button className='' onClick={()=> setCartItems([...cartItems,item])}>Add to <ShoppingCartCheckoutOutlinedIcon/></Button>
+            </CardActions>   */}
+
           </CardContent>  
+          </CardActionArea>
         </Card>
           )
         }
